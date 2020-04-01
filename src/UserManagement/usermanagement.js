@@ -5,10 +5,10 @@ app.post('/verifyuser', async (req, res) => {
   const { name, password } = req.body
   const query = niql.fromString(
     'select ' +
-    bucket._name +
-    ' `user` from ' +
-    bucket._name +
-    ' where name= $1 and `password`= $2'
+      bucket._name +
+      ' `user` from ' +
+      bucket._name +
+      ' where name= $1 and `password`= $2'
   )
   try {
     await bucket.query(query, [name, password], (err, row) => {
@@ -27,10 +27,10 @@ app.post('/updateuserdata', async (req, res) => {
   const { userid, name, password, email, phone } = req.body
   const query = niql.fromString(
     'UPDATE ' +
-    bucket._name +
-    ' USE KEYS $1' +
-    'set name=$2,`password`=$3,email= $4,phone= $5' +
-    "where type='user'"
+      bucket._name +
+      ' USE KEYS $1' +
+      'set name=$2,`password`=$3,email= $4,phone= $5' +
+      "where type='user'"
   )
   try {
     await bucket.query(
@@ -91,10 +91,10 @@ app.post('/createuser', async (req, res) => {
   // });
 })
 app.post('/sendmail', async (req, res) => {
-  const receiver = 'vaibhavisking03@gmail.com';
+  const receiver = 'vaibhavisking03@gmail.com'
   const message = 'hi'
   const subject = 'subject'
-  sendmail(receiver, subject, message, res => {
-    console.log(`Mail has sent successfully and ID is ${res.messageId}`);
+  sendmail(receiver, subject, message, (res) => {
+    console.log(`Mail has sent successfully and ID is ${res.messageId}`)
   })
 })
