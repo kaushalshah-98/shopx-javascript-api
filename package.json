@@ -4,8 +4,14 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon ./server.js"
+    "start": "nodemon ./server.js",
+    "format:check": "npm run prettier",
+    "lint": "tslint --project tsconfig.json --format stylish",
+    "lint-fix": "tslint --fix --project tsconfig.json --format stylish",
+    "commit": "git-cz",
+    "clean": "rimraf .build && rimraf .serverless && rimraf _warmup && rimraf target",
+    "cz": "git-cz",
+    "prettier": "prettier --print-width 80 --no-semi --single-quote --trailing-comma es5 --write src/**/*.js"
   },
   "repository": {
     "type": "git",
