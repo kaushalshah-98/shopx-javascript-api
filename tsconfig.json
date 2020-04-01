@@ -1,0 +1,46 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "es6",
+    "lib": [
+      "es6",
+      "esnext",
+      "es2018"
+    ],
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "preserveSymlinks": true,
+    "rootDir": "./",
+    "sourceMap": true,
+    "declaration": true, 
+    "declarationMap": true, 
+    "noImplicitAny": true,
+    "noUnusedLocals": true,
+    "noImplicitThis": true,
+    "strictNullChecks": true,
+    "alwaysStrict": true,
+    "noImplicitReturns": true,
+    "preserveConstEnums": true,
+    "noFallthroughCasesInSwitch": true,
+    "suppressImplicitAnyIndexErrors": true,
+    "forceConsistentCasingInFileNames": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "pretty": true,
+    "outDir": ".build",
+    "types": [
+      "node",
+      "mocha",
+      "chai" ,
+      "sinon"
+    ],
+    "typeRoots": [
+      "./node_modules/@types"
+    ],
+  },
+  "exclude": [
+    "node_modules",
+    "coverage",
+    "!node_modules/@types"
+  ]
+}
