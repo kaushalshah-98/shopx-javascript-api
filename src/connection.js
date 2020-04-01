@@ -1,11 +1,12 @@
 const express = require('express')
 const bodyParser = require('body-parser')
 const couchbase = require('couchbase')
+const nodemailer = require('nodemailer')
 const uuid = require('uuid')
 const cors = require('cors')
 const app = express()
 const url = 'couchbase://localhost:8091'
-const cluster = new couchbase.Cluster(urlz)
+const cluster = new couchbase.Cluster(url)
 const niql = couchbase.N1qlQuery
 const port_no = 3000
 
@@ -21,4 +22,4 @@ const bucket = cluster.openBucket('amazecart', (err, res) => {
 })
 
 //Exporting the necessary variables
-module.exports = { bucket, app, niql, uuid, port_no }
+module.exports = { bucket, app, niql, nodemailer, uuid, port_no }
