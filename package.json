@@ -11,7 +11,7 @@
     "commit": "git-cz",
     "clean": "rimraf .build && rimraf .serverless && rimraf _warmup && rimraf target",
     "cz": "git-cz",
-    "prettier": "prettier --print-width 80 --no-semi --single-quote --trailing-comma es5 --write src/**/*.js"
+    "prettier": "prettier --write --config ./.prettierrc --list-different src/**/*.js"
   },
   "repository": {
     "type": "git",
