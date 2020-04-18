@@ -1,20 +1,21 @@
-const { app, bucket, niql, uuid } = require('../../config/connection');
-const { sendmail } = require('../Other-functions/sharedfunctions');
+const { app, bucket, niql } = require('../../config/connection');
 const { CONSTANT } = require('../../shared/constant');
 
 //Api for fetching Al users
-app.get('/getallusers', async (req, res) => {
+app.get('/theme/:userid', async (req, res) => {
+  const userid = req.params.userid;
   const query = niql.fromString(
-    `SELECT ${CONSTANT.BUCKET_NAME} as users 
+    `SELECT ${CONSTANT.NIGHT_THEME} 
     FROM  ${CONSTANT.BUCKET_NAME} 
-    WHERE type = '${CONSTANT.USER_TYPE}'`
+    USE KEYS '${userid}'`
   );
+  console.log(query);
   try {
     await bucket.query(query, (err, row) => {
       if (err) {
         throw err;
       } else {
-        res.send(row);
+        res.send(row[0]);
       }
     });
   } catch (err) {
@@ -22,13 +23,13 @@ app.get('/getallusers', async (req, res) => {
   }
 });
 //Api for Blocking the user
-app.put('/blockuser/:userid', async (req, res) => {
+app.put('/theme/:userid', async (req, res) => {
   const userid = req.params.userid;
-  const { status } = req.body;
+  const { night_theme } = req.body;
   const query = niql.fromString(
     `UPDATE ${CONSTANT.BUCKET_NAME}
       USE KEYS '${userid}'
-      set status='${status}'`
+      set night_theme='${night_theme}'`
   );
   try {
     await bucket.query(query, async (err, row) => {

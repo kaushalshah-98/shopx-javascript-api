@@ -62,8 +62,7 @@ app.put('/updateuserdata/:userid', async (req, res) => {
     `UPDATE ${CONSTANT.BUCKET_NAME}
       USE KEYS '${userid}'
       set name='${name}',\`password\` = '${password}', 
-      email= '${email}',profilepic ='${profilepic}'
-     WHERE type = '${CONSTANT.USER_TYPE}'`
+      email= '${email}',profilepic ='${profilepic}'`
   );
   try {
     await bucket.query(query, async (err, row) => {
@@ -90,6 +89,7 @@ app.post('/createuser', async (req, res) => {
   userdoc.userid = userid;
   userdoc.role = 'user';
   userdoc.type = 'USER';
+  userdoc.night_theme = false;
   const receiver = userdoc.email;
   const message = 'Helllo USER';
   const subject = 'Welcome To Shopx';

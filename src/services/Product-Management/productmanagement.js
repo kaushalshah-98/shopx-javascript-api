@@ -4,10 +4,12 @@ const { CONSTANT } = require('../../shared/constant');
 //Api to Fetch all product details
 app.get('/getallproducts', async (req, res) => {
   const query = niql.fromString(
-    'SELECT ' + bucket._name + ' as product FROM ' + bucket._name + " where type ='product'"
+    `SELECT ${CONSTANT.BUCKET_NAME} as product 
+      FROM  ${CONSTANT.BUCKET_NAME} 
+      WHERE type = '${CONSTANT.PRODUCT_TYPE}'`
   );
   try {
-    await await bucket.query(query, [], (err, row) => {
+    await bucket.query(query, (err, row) => {
       if (err) {
         throw err;
       } else {
@@ -21,47 +23,61 @@ app.get('/getallproducts', async (req, res) => {
 //Api to add a Product
 app.post('/addproduct', async (req, res) => {
   let productdoc = req.body;
-  let productid = 'product::' + uuid.v4();
-  productdoc.productid = productid;
-  productdoc.type = 'product';
+  let product_id = 'PRODUCT::' + uuid.v4();
+  productdoc.product_id = product_id;
+  productdoc.type = 'PRODUCT';
   // method 1
   try {
-    await bucket.insert(productid, productdoc, (err, row) => {
+    await bucket.insert(product_id, productdoc, (err, row) => {
       if (err) {
         throw err;
       } else {
-        res.send();
+        res.send(row);
       }
     });
   } catch (err) {
     res.send(err);
   }
-  //method 2
-  // let query = niql.fromString("INSERT INTO `user` (KEY,VALUE) VALUES ($1, $2)");
-  // console.log(query);
-  // user_await bucket.query(query, [userid, userdoc], (err, row) => {
-  //     if (err) {
-  //         errr = {
-  //             Errorcode: err.errno,
-  //             ErrorMessage: err.message,
-  //             Status: err.code
-  //         };
-  //         res.send(errr)
-  //         console.log(err)
-  //     } else {
-  //         console.log(row);
-  //     }
-  // });
 });
 // Api to remove a product
 app.delete('/removeproduct/:productid', async (req, res) => {
-  const { productid } = req.params;
+  const product_id = req.params.productid;
+  console.log(product_id);
   try {
-    await bucket.remove(productid, (err, row) => {
+    await bucket.remove(product_id, (err, row) => {
       if (err) {
         throw err;
       } else {
-        res.send();
+        res.send(row);
+      }
+    });
+  } catch (err) {
+    res.send(err);
+  }
+});
+//Api for Updating a product
+app.put('/updateproduct/:productid', async (req, res) => {
+  const { product_id } = req.params;
+  const { name, password, email, profilepic } = req.body;
+  const query = niql.fromString(
+    `UPDATE ${CONSTANT.BUCKET_NAME}
+      USE KEYS '${product_id}'
+      set name='${name}',\`password\` = '${password}', 
+      email= '${email}',profilepic ='${profilepic}'
+     WHERE type = '${CONSTANT.USER_TYPE}'`
+  );
+  try {
+    await bucket.query(query, async (err, row) => {
+      if (err) {
+        throw err;
+      } else {
+        await bucket.get(product_id, (err, rows) => {
+          if (err) {
+            throw err;
+          } else {
+            res.send(rows);
+          }
+        });
       }
     });
   } catch (err) {
