@@ -5,7 +5,6 @@ const nodemailer = require('nodemailer');
 const uuid = require('uuid');
 const cors = require('cors');
 const app = express();
-const { CONSTANT } = require('../shared/constant');
 const url = 'couchbase://localhost:8091';
 const cluster = new couchbase.Cluster(url);
 const niql = couchbase.N1qlQuery;
