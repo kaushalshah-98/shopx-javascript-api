@@ -42,9 +42,28 @@ app.post('/addproduct', async (req, res) => {
 // Api to remove a product
 app.delete('/removeproduct/:productid', async (req, res) => {
   const product_id = req.params.productid;
-  console.log(product_id);
   try {
     await bucket.remove(product_id, (err, row) => {
+      if (err) {
+        throw err;
+      } else {
+        res.send(row);
+      }
+    });
+  } catch (err) {
+    res.send(err);
+  }
+});
+// Api to get a product
+app.get('/getproduct/:productid', async (req, res) => {
+  const product_id = req.params.productid;
+  const query = niql.fromString(
+    `SELECT ${CONSTANT.BUCKET_NAME} as product 
+      FROM  ${CONSTANT.BUCKET_NAME} 
+      USE KEYS '${product_id}'`
+  );
+  try {
+    await bucket.query(query, (err, row) => {
       if (err) {
         throw err;
       } else {

@@ -7,7 +7,7 @@ app.get('/getbuylistitems/:userid', async (req, res) => {
   const query = niql.fromString(
     `SELECT list
     FROM  ${CONSTANT.BUCKET_NAME}  
-    USE KEYS ${buylist_id}`
+    USE KEYS '${buylist_id}'`
   );
   try {
     await bucket.query(query, (err, row) => {
@@ -16,7 +16,9 @@ app.get('/getbuylistitems/:userid', async (req, res) => {
       } else if (row.length <= 0) {
         res.send(row);
       } else {
-        res.send(row);
+        // let response = row.map((item) => item.list);
+        // console.log(response[0]);
+        res.send(row[0].list);
       }
     });
   } catch (err) {
@@ -28,7 +30,7 @@ app.get('/getbuylistitems/:userid', async (req, res) => {
 app.post('/addtolist/:userid', async (req, res) => {
   const buylist_id = 'BUYLIST::' + req.params.userid;
   const listdoc = req.body;
-  listdoc.userid = userid;
+  listdoc.userid = req.params.userid;
   listdoc.type = 'BUYLIST';
   // method 1
   try {
