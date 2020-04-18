@@ -1,4 +1,4 @@
-const { app, bucket, niql, uuid } = require('../connection');
+const { app, bucket, niql, uuid } = require('../../config/connection');
 
 //Api to Fetch all product details
 app.get('/getallproducts', async (req, res) => {

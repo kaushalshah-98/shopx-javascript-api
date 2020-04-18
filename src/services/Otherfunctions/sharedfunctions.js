@@ -1,4 +1,4 @@
-const { nodemailer } = require('../connection');
+const { nodemailer } = require('../../config/connection');
 
 let sendmail = async (receiver, subject, message, callback) => {
   //create reusable transporter object using the default SMTP transport

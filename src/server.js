@@ -1,5 +1,5 @@
-const { app, port_no } = require('./connection');
-
+// const { app, port_no } = require('./connection');
+const { app, port_no } = require('../config/connection');
 //Importing the files
 require('./UserManagement/usermanagement.js');
 require('./ProductManagement/productmanagement.js');

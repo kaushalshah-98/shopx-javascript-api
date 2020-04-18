@@ -1,4 +1,4 @@
-const { app, bucket, niql, uuid } = require('../connection');
+const { app, bucket, niql, uuid } = require('../../config/connection');
 const { sendmail } = require('../Otherfunctions/sharedfunctions');
 //Api for verifying the user
 app.post('/verifyuser', async (req, res) => {

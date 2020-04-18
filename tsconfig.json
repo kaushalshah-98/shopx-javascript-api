@@ -2,18 +2,15 @@
   "compilerOptions": {
     "module": "commonjs",
     "target": "es6",
-    "lib": [
-      "es6",
-      "esnext",
-      "es2018"
-    ],
+    "baseUrl": "./",
+    "lib": ["es6", "esnext", "es2018"],
     "moduleResolution": "node",
     "esModuleInterop": true,
     "preserveSymlinks": true,
     "rootDir": "./",
     "sourceMap": true,
-    "declaration": true, 
-    "declarationMap": true, 
+    "declaration": true,
+    "declarationMap": true,
     "noImplicitAny": true,
     "noUnusedLocals": true,
     "noImplicitThis": true,
@@ -27,20 +24,14 @@
     "allowSyntheticDefaultImports": true,
     "strict": true,
     "pretty": true,
-    "outDir": ".build",
-    "types": [
-      "node",
-      "mocha",
-      "chai" ,
-      "sinon"
-    ],
-    "typeRoots": [
-      "./node_modules/@types"
-    ],
+    "outDir": "dist",
+    "types": ["node"],
+    "typeRoots": ["./node_modules/@types"],
+    "paths": {
+      "@connection/*": ["src/config/connection/*"],
+      "@config/*": ["src/config/config/*"]
+    }
   },
-  "exclude": [
-    "node_modules",
-    "coverage",
-    "!node_modules/@types"
-  ]
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules"]
 }

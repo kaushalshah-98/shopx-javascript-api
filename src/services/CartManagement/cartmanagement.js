@@ -1,4 +1,4 @@
-const { app, bucket, niql } = require('../connection');
+const { app, bucket, niql } = require('../../config/connection');
 
 //Api to get the cart items of particular user
 app.get('/getcartitems/:userid', async (req, res) => {
