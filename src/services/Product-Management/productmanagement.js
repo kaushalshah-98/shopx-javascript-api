@@ -1,4 +1,5 @@
 const { app, bucket, niql, uuid } = require('../../config/connection');
+const { CONSTANT } = require('../../shared/constant');
 
 //Api to Fetch all product details
 app.get('/getallproducts', async (req, res) => {

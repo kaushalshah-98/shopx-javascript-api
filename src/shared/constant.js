@@ -5,7 +5,7 @@ const CONSTANT = {
   SCRIPT_TYPE: 'SCRIPT',
   PORT_NUMBER: 3000,
   URL: 'couchbase://localhost:8091',
-  BUCKET_NAME: 'amazecart'
+  BUCKET_NAME: 'shopx'
 };
 
 module.exports = { CONSTANT };
