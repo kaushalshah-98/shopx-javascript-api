@@ -4,11 +4,8 @@
   "description": "",
   "main": "./src/server.js",
   "scripts": {
-    "build": "tsc",
-    "dev": "ts-node ./src/server.ts",
-    "start": "nodemon ./dist/server.js",
-    "prod": "npm run build && npm run start",
-    "format:check": "npm run prettier",
+    "start": "nodemon ./src/server.js",
+    "lint:ci": "npm run prettier",
     "lint": "tslint --project tsconfig.json --format stylish",
     "lint-fix": "tslint --fix --project tsconfig.json --format stylish",
     "commit": "git-cz",
