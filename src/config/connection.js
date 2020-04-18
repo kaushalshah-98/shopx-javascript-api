@@ -5,7 +5,7 @@ const nodemailer = require('nodemailer');
 const uuid = require('uuid');
 const cors = require('cors');
 const app = express();
-const { CONSTANT } = require('../shared/constant')
+const { CONSTANT } = require('../shared/constant');
 const url = CONSTANT.URL;
 const cluster = new couchbase.Cluster(url);
 const niql = couchbase.N1qlQuery;
@@ -18,8 +18,10 @@ app.use(cors());
 cluster.authenticate('Administrator', 'couchbase');
 
 const bucket = cluster.openBucket(CONSTANT.BUCKET_NAME, (err, res) => {
-  if (err) { console.log(err); throw err; }
-  else console.log(bucket._name + ' bucket is opened...');
+  if (err) {
+    console.log(err);
+    throw err;
+  } else console.log(bucket._name + ' bucket is opened...');
 });
 
 //Exporting the necessary variables

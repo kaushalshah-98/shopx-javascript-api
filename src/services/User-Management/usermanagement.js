@@ -57,7 +57,7 @@ app.post('/forgotpassword', async (req, res) => {
 //Api for Updating the user data
 app.put('/updateuserdata/:userid', async (req, res) => {
   const userid = req.params.userid;
-  const {name, password, email, profilepic } = req.body;
+  const { name, password, email, profilepic } = req.body;
   const query = niql.fromString(
     `UPDATE ${CONSTANT.BUCKET_NAME}
       USE KEYS '${userid}'
