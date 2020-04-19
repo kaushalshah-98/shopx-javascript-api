@@ -18,7 +18,28 @@ app.post('/verifyuser', async (req, res) => {
       } else if (row.length <= 0) {
         res.send(row);
       } else {
-        res.send(row);
+        let user = row.map((userdata) => userdata.user);
+        res.send(user[0]);
+      }
+    });
+  } catch (err) {
+    res.send(err);
+  }
+});
+//Api for Getting the user
+app.get('/getuser/:userid', async (req, res) => {
+  const userid = req.params.userid;
+  const query = niql.fromString(
+    `SELECT * FROM ${CONSTANT.BUCKET_NAME} as \`user\`
+      USE KEYS '${userid}'`
+  );
+  try {
+    await bucket.query(query, async (err, row) => {
+      if (err) {
+        throw err;
+      } else {
+        let user = row.map((userdata) => userdata.user);
+        res.send(user[0]);
       }
     });
   } catch (err) {
@@ -45,9 +66,9 @@ app.post('/forgotpassword', async (req, res) => {
         const message = `Your Password is ${row[0].password}`;
         const subject = `Hello ${name}`;
         res.send(row);
-        sendmail(receiver, subject, message, (res) => {
-          console.log(`Mail has sent successfully and ID is ${res.messageId}`);
-        });
+        // sendmail(receiver, subject, message, (res) => {
+        //   console.log(`Mail has sent successfully and ID is ${res.messageId}`);
+        // });
       }
     });
   } catch (err) {
@@ -93,6 +114,7 @@ app.post('/createuser', async (req, res) => {
   const receiver = userdoc.email;
   const message = 'Helllo USER';
   const subject = 'Welcome To Shopx';
+
   // method 1
   try {
     await bucket.insert(userid, userdoc, (err, row) => {
@@ -100,9 +122,9 @@ app.post('/createuser', async (req, res) => {
         throw err;
       } else {
         res.send(row);
-        sendmail(receiver, subject, message, (res) => {
-          console.log(`Mail has sent successfully and ID is ${res.messageId}`);
-        });
+        // sendmail(receiver, subject, message, (res) => {
+        //   console.log(`Mail has sent successfully and ID is ${res.messageId}`);
+        // });
       }
     });
   } catch (err) {
@@ -126,11 +148,12 @@ app.post('/createuser', async (req, res) => {
   // });
 });
 //Api for Sending Mail to the user
-app.post('/sendmail', async (req, res) => {
-  const receiver = 'vaibhavisking03@gmail.com';
-  const message = 'hi';
-  const subject = 'subject';
-  sendmail(receiver, subject, message, (res) => {
-    console.log(`Mail has sent successfully and ID is ${res.messageId}`);
+app.post('/sendmessage', async (req, res) => {
+  const { subject, message } = req.body;
+  const receiver = 'shopx589@gmail.com';
+  console.log(req.body);
+  sendmail(receiver, subject, message, (response) => {
+    console.log(`Mail has sent successfully and ID is ${response.messageId}`);
+    res.send();
   });
 });

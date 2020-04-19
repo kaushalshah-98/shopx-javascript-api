@@ -9,7 +9,6 @@ app.get('/theme/:userid', async (req, res) => {
     FROM  ${CONSTANT.BUCKET_NAME} 
     USE KEYS '${userid}'`
   );
-  console.log(query);
   try {
     await bucket.query(query, (err, row) => {
       if (err) {
@@ -29,7 +28,7 @@ app.put('/theme/:userid', async (req, res) => {
   const query = niql.fromString(
     `UPDATE ${CONSTANT.BUCKET_NAME}
       USE KEYS '${userid}'
-      set night_theme='${night_theme}'`
+      set night_theme= ${night_theme}`
   );
   try {
     await bucket.query(query, async (err, row) => {

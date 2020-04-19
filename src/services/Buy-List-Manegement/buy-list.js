@@ -29,9 +29,12 @@ app.get('/getbuylistitems/:userid', async (req, res) => {
 //Api for Creating the user
 app.post('/addtolist/:userid', async (req, res) => {
   const buylist_id = 'BUYLIST::' + req.params.userid;
-  const listdoc = req.body;
-  listdoc.userid = req.params.userid;
-  listdoc.type = 'BUYLIST';
+  const listarray = req.body;
+  const listdoc = {
+    list: listarray,
+    userid: req.params.userid,
+    type: 'BUYLIST'
+  };
   // method 1
   try {
     await bucket.upsert(buylist_id, listdoc, (err, row) => {
