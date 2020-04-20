@@ -114,7 +114,6 @@ app.post('/createuser', async (req, res) => {
   const receiver = userdoc.email;
   const message = 'Helllo USER';
   const subject = 'Welcome To Shopx';
-
   // method 1
   try {
     await bucket.insert(userid, userdoc, (err, row) => {

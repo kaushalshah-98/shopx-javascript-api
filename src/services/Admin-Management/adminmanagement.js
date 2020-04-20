@@ -14,7 +14,8 @@ app.get('/getallusers', async (req, res) => {
       if (err) {
         throw err;
       } else {
-        res.send(row);
+        let users = row.map((data) => data.users);
+        res.send(users);
       }
     });
   } catch (err) {
@@ -28,7 +29,7 @@ app.put('/blockuser/:userid', async (req, res) => {
   const query = niql.fromString(
     `UPDATE ${CONSTANT.BUCKET_NAME}
       USE KEYS '${userid}'
-      set status='${status}'`
+      set status=${status}`
   );
   try {
     await bucket.query(query, async (err, row) => {
