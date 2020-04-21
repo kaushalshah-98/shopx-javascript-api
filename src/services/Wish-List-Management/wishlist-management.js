@@ -5,10 +5,11 @@ const { CONSTANT } = require('../../shared/constant');
 app.get('/getwishlistitems/:userid', async (req, res) => {
   const wishlist_id = 'WISHLIST::' + req.params.userid;
   const query = niql.fromString(
-    `SELECT {items.product_id,items.qty,p.name,p.price,p.image,p.quantity} as wishlistitem
+    `SELECT {items.product_id,p.name,p.price,p.image,p.quantity,p.description,p.details} 
+      AS ${CONSTANT.WISHLIST_ITEMS}
       FROM  ${CONSTANT.BUCKET_NAME}  a 
-       USE KEYS ${wishlist_id}
-       UNNEST a.wishlistitems as items
+       USE KEYS '${wishlist_id}'
+       UNNEST a.${CONSTANT.WISHLIST_ITEMS} as items
        JOIN  ${CONSTANT.BUCKET_NAME} 
        p ON KEYS [items.product_id]`
   );
@@ -19,29 +20,8 @@ app.get('/getwishlistitems/:userid', async (req, res) => {
       } else if (row.length <= 0) {
         res.send(row);
       } else {
-        res.send(row);
-      }
-    });
-  } catch (err) {
-    res.send(err);
-  }
-});
-// //Api to get the wishlist size of particular user
-app.get('/wishlistsize/:userid', async (req, res) => {
-  const wishlist_id = 'WISHLIST::' + req.params.userid;
-  const query = niql.fromString(
-    `SELECT count(items) as wishlistsize
-      FROM ${CONSTANT.BUCKET_NAME} a
-      USE KEYS ${wishlist_id}
-      UNNEST a.wishlistitems as items`
-  );
-  try {
-    await bucket.query(query, [wishlist_id], async (err, row) => {
-      if (err) {
-        throw err;
-      } else {
-        // let wishlistsize = row.reduce((wishlistsize) => wishlistsize[0].wishlistsize);
-        res.send(row);
+        let wishlist = row.map((data) => data.wishlistitems);
+        res.send(wishlist);
       }
     });
   } catch (err) {
@@ -62,8 +42,7 @@ app.post('/AddToWishlist', async (req, res) => {
         doc = {
           wishlistitems: [
             {
-              product_id: product_id,
-              qty: 1
+              product_id: product_id
             }
           ],
           userid: userid,
@@ -71,55 +50,46 @@ app.post('/AddToWishlist', async (req, res) => {
         };
         await bucket.insert(wishlist_id, doc, (err, row) => {
           if (err) throw err;
+          else res.send(row);
         });
       } else {
         const query = niql.fromString(
-          `SELECT items.qty
-          FROM  ${CONSTANT.BUCKET_NAME} a 
+          `SELECT * FROM ${CONSTANT.BUCKET_NAME} 
           USE KEYS '${wishlist_id}'
-          UNNEST a.wishlistitems items
-          WHERE items.product_id = '${product_id}'
-          AND a.type = '${CONSTANT.WISHLIST_TYPE}'`
+          UNNEST ${CONSTANT.WISHLIST_ITEMS} as list
+          WHERE list.product_id = '${product_id}'`
         );
-        await bucket.query(query, async (err, row) => {
-          if (err) {
-            throw err;
-          } else if (row === null || row.length <= 0 || row === undefined) {
-            let newitem = {
-              product_id: product_id,
-              qty: 1
-            };
-            const query = niql.fromString(
-              `update ${CONSTANT.BUCKET_NAME}
-               SET wishlistitems = ARRAY_APPEND( wishlistitems,${newitem}) 
-               where userid = '${userid}' AND type = '${CONSTANT.WISHLIST_TYPE}'`
-            );
-            await bucket.query(query, (err, row) => {
-              if (err) {
-                throw err;
-              } else {
-                res.send();
-              }
-            });
-          } else {
-            let quantity = ++row[0].qty;
-            let query = niql.fromString(
-              `UPDATE ${CONSTANT.BUCKET_NAME} a
-                SET item.qty = ${quantity}
-                FOR item IN wishlistitems
-                WHEN item.product_id = '${product_id}' 
-                AND type = 'wishlist' AND a.userid = '${userid}' 
-                END;`
-            );
-            await bucket.query(query, (err, row) => {
-              if (err) {
-                throw err;
-              } else {
-                res.send();
-              }
-            });
-          }
-        });
+        try {
+          await bucket.query(query, async (err, row) => {
+            if (err) {
+              throw err;
+            } else if (row.length <= 0) {
+              let newitem = {
+                product_id: product_id
+              };
+              const query = niql.fromString(
+                `UPDATE ${CONSTANT.BUCKET_NAME}
+                  SET ${CONSTANT.WISHLIST_ITEMS} = ARRAY_APPEND( ${CONSTANT.WISHLIST_ITEMS},$1) 
+                  WHERE ${CONSTANT.USER_ID} = '${userid}' 
+                  AND type = '${CONSTANT.WISHLIST_TYPE}'`
+              );
+              await bucket.query(query, [newitem], (err, row) => {
+                if (err) {
+                  throw err;
+                } else {
+                  res.send(row);
+                }
+              });
+            } else {
+              let obj = {
+                message: 'Already there in list'
+              };
+              res.send(obj);
+            }
+          });
+        } catch (err) {
+          res.send(err);
+        }
       }
     });
   } catch (err) {
@@ -143,7 +113,7 @@ app.delete('/emptywishlist/:userid', async (req, res) => {
   }
 });
 // //Api to remove wishlistitem
-app.post('/removewishlistitem/:userid', async (req, res) => {
+app.put('/removewishlistitem/:userid', async (req, res) => {
   const { product_id } = req.body;
   const userid = req.params.userid;
   const wishlist_id = 'WISHLIST::' + userid;
@@ -188,28 +158,4 @@ app.post('/removewishlistitem/:userid', async (req, res) => {
   //         res.send(row)
   //     }
   // });
-});
-// //Api to update wishlistitem
-app.put('/updatewishlistitem/:userid', async (req, res) => {
-  const { quantity, product_id } = req.body;
-  const { userid } = req.params;
-  const query = niql.fromString(
-    `UPDATE ${CONSTANT.BUCKET_NAME} a
-    SET item.qty = ${quantity}
-    FOR item IN wishlistitems'
-    WHEN item.product_id = '${product_id}'
-    AND a.userid = '${userid}'
-    END`
-  );
-  try {
-    await bucket.query(query, (err, row) => {
-      if (err) {
-        throw err;
-      } else {
-        res.send(row);
-      }
-    });
-  } catch (err) {
-    res.send(err);
-  }
 });
