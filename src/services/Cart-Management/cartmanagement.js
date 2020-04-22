@@ -1,27 +1,27 @@
 const { app, bucket, niql } = require('../../config/connection');
+const { CONSTANT } = require('../../shared/constant');
 
 //Api to get the cart items of particular user
 app.get('/getcartitems/:userid', async (req, res) => {
-  const cartid = 'cart::' + req.params.userid;
+  const cartId = 'CART::' + req.params.userid;
   const query = niql.fromString(
-    'SELECT {items.productid,items.qty,p.name,p.price,p.image,p.quantity} as cartitem' +
-      ' FROM ' +
-      bucket._name +
-      ' a' +
-      ' USE KEYS $1' +
-      ' UNNEST a.cartitems as items' +
-      ' JOIN ' +
-      bucket._name +
-      ' p ON KEYS [items.productid]'
+    `SELECT {items.product_id,items.qty,p.name,p.price,p.image,p.quantity,p.description,p.details} 
+      AS ${CONSTANT.CART_ITEMS}
+      FROM  ${CONSTANT.BUCKET_NAME}  a 
+       USE KEYS '${cartId}'
+       UNNEST a.${CONSTANT.CART_ITEMS} as items
+       JOIN  ${CONSTANT.BUCKET_NAME} 
+       p ON KEYS [items.product_id]`
   );
   try {
-    await bucket.query(query, [cartid], (err, row) => {
+    await bucket.query(query, (err, row) => {
       if (err) {
         throw err;
       } else if (row.length <= 0) {
         res.send(row);
       } else {
-        res.send(row);
+        let wishlist = row.map((data) => data.cartitems);
+        res.send(wishlist);
       }
     });
   } catch (err) {
@@ -30,18 +30,16 @@ app.get('/getcartitems/:userid', async (req, res) => {
 });
 // //Api to get the cart size of particular user
 app.get('/cartsize/:userid', async (req, res) => {
-  const cartid = 'cart::' + req.params.userid;
+  const cartId = 'CART::' + req.params.userid;
 
   const query = niql.fromString(
-    'SELECT count(items) as cartsize' +
-      ' FROM ' +
-      bucket._name +
-      ' a' +
-      ' USE KEYS $1' +
-      ' UNNEST a.cartitems as items'
+    `SELECT COUNT(items) AS cartsize
+    FROM  ${CONSTANT.BUCKET_NAME}  
+    USE KEYS '${cartId}'
+    UNNEST ${CONSTANT.CART_ITEMS} as items`
   );
   try {
-    await bucket.query(query, [cartid], async (err, row) => {
+    await bucket.query(query, async (err, row) => {
       if (err) {
         throw err;
       } else {
@@ -55,77 +53,72 @@ app.get('/cartsize/:userid', async (req, res) => {
 });
 // //Api to add product to cart
 app.post('/AddTocart', async (req, res) => {
-  const { productid, userid } = req.body;
-  const cartid = 'cart::' + userid;
+  const { product_id, userid } = req.body;
+  const cartId = 'CART::' + userid;
 
-  const query = niql.fromString(' SELECT *' + ' FROM ' + bucket._name + '' + ' USE KEYS $1');
+  const query = niql.fromString(`SELECT * FROM ${CONSTANT.BUCKET_NAME} USE KEYS '${cartId}'`);
   try {
-    await bucket.query(query, [cartid], async (err, row) => {
+    await bucket.query(query, async (err, row) => {
       if (err) {
         throw err;
-      } else if (row === null || row.length <= 0 || row === undefined) {
+      } else if (row.length <= 0) {
         doc = {
           cartitems: [
             {
-              productid: productid,
+              product_id: product_id,
               qty: 1
             }
           ],
           userid: userid,
-          type: 'cart'
+          type: 'CART'
         };
-        await bucket.insert(cartid, doc, (err, row) => {
+        await bucket.insert(cartId, doc, (err, row) => {
           if (err) throw err;
+          else res.send(row);
         });
       } else {
         const query = niql.fromString(
-          'SELECT items.qty' +
-            ' FROM ' +
-            bucket._name +
-            ' a' +
-            ' USE KEYS $1' +
-            ' UNNEST a.cartitems items' +
-            " WHERE items.productid=$2 and a.type='cart'"
+          `SELECT list.qty FROM ${CONSTANT.BUCKET_NAME} 
+          USE KEYS '${cartId}'
+          UNNEST ${CONSTANT.CART_ITEMS} AS list
+          WHERE list.product_id = '${product_id}'`
         );
-        await bucket.query(query, [cartid, productid], async (err, row) => {
+        await bucket.query(query, async (err, row) => {
           if (err) {
             throw err;
-          } else if (row === null || row.length <= 0 || row === undefined) {
+          } else if (row.length <= 0) {
             let newitem = {
-              productid: productid,
+              product_id: product_id,
               qty: 1
             };
             const query = niql.fromString(
-              'update ' +
-                bucket._name +
-                '' +
-                ' SET cartitems = ARRAY_APPEND( cartitems,$1)' +
-                " where userid = $2 and type='cart'"
+              `UPDATE ${CONSTANT.BUCKET_NAME}
+                SET ${CONSTANT.CART_ITEMS} = ARRAY_APPEND( ${CONSTANT.CART_ITEMS},$1) 
+                WHERE ${CONSTANT.USER_ID} = '${userid}' 
+                AND type = '${CONSTANT.CART_TYPE}'`
             );
-            await bucket.query(query, [newitem, userid], (err, row) => {
+            await bucket.query(query, [newitem], (err, row) => {
               if (err) {
                 throw err;
               } else {
-                res.send();
+                res.send(row);
               }
             });
           } else {
             let quantity = ++row[0].qty;
             let query = niql.fromString(
-              'update ' +
-                bucket._name +
-                ' a' +
-                ' SET item.qty = $1' +
-                ' FOR item IN cartitems' +
-                ' WHEN item.productid = $2 AND' +
-                " type = 'cart' AND a.userid = $3" +
-                ' END;'
+              `UPDATE ${CONSTANT.BUCKET_NAME} AS a
+              SET item.qty = ${quantity}
+              FOR item IN ${CONSTANT.CART_ITEMS}
+              WHEN item.product_id = '${product_id}'
+              AND type = '${CONSTANT.CART_TYPE}' AND a.userid = '${userid}'
+              END;`
             );
-            await bucket.query(query, [quantity, productid, userid], (err, row) => {
+            await bucket.query(query, (err, row) => {
               if (err) {
                 throw err;
               } else {
-                res.send();
+                res.send(row);
               }
             });
           }
@@ -138,10 +131,10 @@ app.post('/AddTocart', async (req, res) => {
 });
 // //Api to empty cart of particular user
 app.delete('/emptycart/:userid', async (req, res) => {
-  const { userid } = req.params;
-  const cartid = 'cart::' + userid;
+  const userid = req.params.userid;
+  const cartId = 'CART::' + userid;
   try {
-    await bucket.remove(cartid, (err, row) => {
+    await bucket.remove(cartId, (err, row) => {
       if (err) {
         throw err;
       } else {
@@ -153,22 +146,20 @@ app.delete('/emptycart/:userid', async (req, res) => {
   }
 });
 // //Api to remove cartitem
-app.post('/removecartitem/:userid', async (req, res) => {
-  const { productid } = req.body;
-  const { userid } = req.params;
-  const cartid = 'cart::' + userid;
+app.put('/removecartitem/:userid', async (req, res) => {
+  const { product_id } = req.body;
+  const userid = req.params.userid;
+  const cartId = 'CART::' + userid;
 
   const query = niql.fromString(
-    'UPDATE ' +
-      bucket._name +
-      ' a' +
-      ' USE KEYS $1' +
-      ' SET a.cartitems = ARRAY items FOR items IN a.cartitems ' +
-      ' WHEN items.productid != $2' +
-      ' END'
+    `UPDATE ${CONSTANT.BUCKET_NAME} a
+      USE KEYS '${cartId}'
+      SET a.cartitems = ARRAY items FOR items IN a.cartitems
+      WHEN items.product_id != '${product_id}'
+      END`
   );
   try {
-    await bucket.query(query, [cartid, productid], (err, row) => {
+    await bucket.query(query, (err, row) => {
       if (err) {
         throw err;
       } else {
@@ -203,20 +194,19 @@ app.post('/removecartitem/:userid', async (req, res) => {
 });
 // //Api to update cartitem
 app.put('/updatecartitem/:userid', async (req, res) => {
-  const { quantity, productid } = req.body;
-  const { userid } = req.params;
+  const { quantity, product_id } = req.body;
+  const userid = req.params.userid;
   const query = niql.fromString(
-    'update ' +
-      bucket._name +
-      ' a' +
-      ' SET item.qty = $1' +
-      ' FOR item IN cartitems' +
-      ' WHEN item.productid = $2 AND' +
-      ' a.userid = $3' +
-      ' END'
+    `UPDATE ${CONSTANT.BUCKET_NAME}
+    SET item.qty =  ${quantity} 
+    FOR item IN ${CONSTANT.CART_ITEMS} 
+    WHEN item.product_id = '${product_id}' END
+    WHERE type= '${CONSTANT.CART_TYPE}' 
+    AND userid = '${userid}'`
   );
+  console.log(query);
   try {
-    await bucket.query(query, [quantity, productid, userid], (err, row) => {
+    await bucket.query(query, (err, row) => {
       if (err) {
         throw err;
       } else {

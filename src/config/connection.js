@@ -4,6 +4,7 @@ const couchbase = require('couchbase');
 const nodemailer = require('nodemailer');
 const uuid = require('uuid');
 const cors = require('cors');
+const dateformat = require('dateformat');
 const app = express();
 const { CONSTANT } = require('../shared/constant');
 const url = CONSTANT.URL;
@@ -25,4 +26,4 @@ const bucket = cluster.openBucket(CONSTANT.BUCKET_NAME, (err, res) => {
 });
 
 //Exporting the necessary variables
-module.exports = { bucket, app, niql, nodemailer, uuid, port_no };
+module.exports = { bucket, app, niql, nodemailer, uuid, port_no, dateformat };

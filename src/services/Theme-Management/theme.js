@@ -22,7 +22,7 @@ app.get('/theme/:userid', async (req, res) => {
   }
 });
 //Api for Blocking the user
-app.put('/theme/:userid', async (req, res) => {
+app.put('/changetheme/:userid', async (req, res) => {
   const userid = req.params.userid;
   const { night_theme } = req.body;
   const query = niql.fromString(
@@ -30,6 +30,7 @@ app.put('/theme/:userid', async (req, res) => {
       USE KEYS '${userid}'
       set night_theme= ${night_theme}`
   );
+  console.log(query);
   try {
     await bucket.query(query, async (err, row) => {
       if (err) {
