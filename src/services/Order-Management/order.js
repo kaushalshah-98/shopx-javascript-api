@@ -37,7 +37,7 @@ app.get('/getallorders', async (req, res) => {
       if (err) {
         throw err;
       } else {
-        let orders = row.map(data => data.orders);
+        let orders = row.map((data) => data.orders);
         res.send(orders);
       }
     });
@@ -59,9 +59,7 @@ app.post('/addorder/:userid', async (req, res) => {
     userid: req.params.userid,
     type: 'ORDER'
   };
-  const query = niql.fromString(
-    `SELECT * FROM  ${CONSTANT.BUCKET_NAME} USE KEYS '${order_id}'`
-  );
+  const query = niql.fromString(`SELECT * FROM  ${CONSTANT.BUCKET_NAME} USE KEYS '${order_id}'`);
   try {
     await bucket.query(query, (err, row) => {
       if (err) {
