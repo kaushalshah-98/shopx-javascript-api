@@ -16,8 +16,6 @@ app.get('/getbuylistitems/:userid', async (req, res) => {
       } else if (row.length <= 0) {
         res.send(row);
       } else {
-        // let response = row.map((item) => item.list);
-        // console.log(response[0]);
         res.send(row[0].list);
       }
     });

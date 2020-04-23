@@ -30,7 +30,6 @@ app.put('/changetheme/:userid', async (req, res) => {
       USE KEYS '${userid}'
       set night_theme= ${night_theme}`
   );
-  console.log(query);
   try {
     await bucket.query(query, async (err, row) => {
       if (err) {

@@ -22,7 +22,6 @@ let sendmail = async (receiver, subject, message, callback) => {
     if (error) {
       console.log(error);
     } else {
-      console.log(`successfully sent with ${res.response}`);
       callback(res);
     }
   });

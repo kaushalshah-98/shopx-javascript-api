@@ -66,9 +66,7 @@ app.post('/forgotpassword', async (req, res) => {
         const message = `Your Password is ${row[0].password}`;
         const subject = `Hello ${name}`;
         res.send(row);
-        // sendmail(receiver, subject, message, (res) => {
-        //   console.log(`Mail has sent successfully and ID is ${res.messageId}`);
-        // });
+        sendmail(receiver, subject, message, (res) => {});
       }
     });
   } catch (err) {
@@ -112,7 +110,7 @@ app.post('/createuser', async (req, res) => {
   userdoc.type = 'USER';
   userdoc.night_theme = false;
   const receiver = userdoc.email;
-  const message = 'Helllo USER';
+  const message = `Helllo ${userdoc.name}`;
   const subject = 'Welcome To Shopx';
   // method 1
   try {
@@ -121,9 +119,9 @@ app.post('/createuser', async (req, res) => {
         throw err;
       } else {
         res.send(row);
-        // sendmail(receiver, subject, message, (res) => {
-        //   console.log(`Mail has sent successfully and ID is ${res.messageId}`);
-        // });
+        sendmail(receiver, subject, message, (res) => {
+          console.log(`Mail has sent successfully and ID is ${res.messageId}`);
+        });
       }
     });
   } catch (err) {
@@ -150,9 +148,7 @@ app.post('/createuser', async (req, res) => {
 app.post('/sendmessage', async (req, res) => {
   const { subject, message } = req.body;
   const receiver = 'shopx589@gmail.com';
-  console.log(req.body);
   sendmail(receiver, subject, message, (response) => {
-    console.log(`Mail has sent successfully and ID is ${response.messageId}`);
     res.send();
   });
 });

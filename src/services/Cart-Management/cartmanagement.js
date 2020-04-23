@@ -204,7 +204,6 @@ app.put('/updatecartitem/:userid', async (req, res) => {
     WHERE type= '${CONSTANT.CART_TYPE}' 
     AND userid = '${userid}'`
   );
-  console.log(query);
   try {
     await bucket.query(query, (err, row) => {
       if (err) {

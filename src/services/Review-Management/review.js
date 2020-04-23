@@ -9,7 +9,6 @@ app.get('/getreviews/:product_id', async (req, res) => {
     FROM  ${CONSTANT.BUCKET_NAME}  
     USE KEYS '${review_id}'`
   );
-  console.log(query);
   try {
     await bucket.query(query, (err, row) => {
       if (err) {
@@ -17,8 +16,6 @@ app.get('/getreviews/:product_id', async (req, res) => {
       } else if (row.length <= 0) {
         res.send(row);
       } else {
-        // let response = row.map((item) => item.list);
-        // console.log(response[0]);
         res.send(row[0].list);
       }
     });
@@ -36,7 +33,6 @@ app.post('/addreview/:product_id', async (req, res) => {
     product_id: req.params.product_id,
     type: 'REVIEW'
   };
-  console.log(doc);
   // method 1
   try {
     await bucket.upsert(review_id, doc, (err, row) => {

@@ -26,15 +26,19 @@ app.get('/getUserOrder/:userid', async (req, res) => {
 //Api to get the wishlist items of particular user
 app.get('/getallorders', async (req, res) => {
   const query = niql.fromString(
-    `SELECT orders FROM  ${CONSTANT.BUCKET_NAME} 
-    WHERE type ='${CONSTANT.ORDER_TYPE}'`
+    `SELECT {u.name,u.profilepic,a.orders} AS orders
+    FROM ${CONSTANT.BUCKET_NAME} a
+    JOIN ${CONSTANT.BUCKET_NAME} u
+    ON KEYS [a.userid]
+    WHERE a.type='${CONSTANT.ORDER_TYPE}'`
   );
   try {
     await bucket.query(query, (err, row) => {
       if (err) {
         throw err;
       } else {
-        res.send(row[0].orders);
+        let orders = row.map(data => data.orders);
+        res.send(orders);
       }
     });
   } catch (err) {
@@ -56,7 +60,7 @@ app.post('/addorder/:userid', async (req, res) => {
     type: 'ORDER'
   };
   const query = niql.fromString(
-    `SELECT orders FROM  ${CONSTANT.BUCKET_NAME} USE KEYS '${order_id}'`
+    `SELECT * FROM  ${CONSTANT.BUCKET_NAME} USE KEYS '${order_id}'`
   );
   try {
     await bucket.query(query, (err, row) => {
@@ -70,9 +74,9 @@ app.post('/addorder/:userid', async (req, res) => {
       } else {
         const query = niql.fromString(
           `UPDATE ${CONSTANT.BUCKET_NAME}
-                      SET ${CONSTANT.ORDERS} = ARRAY_APPEND( ${CONSTANT.ORDERS},$1) 
-                      WHERE ${CONSTANT.USER_ID} = '${userid}' 
-                      AND type = '${CONSTANT.ORDER_TYPE}'`
+           SET ${CONSTANT.ORDERS} = ARRAY_APPEND( ${CONSTANT.ORDERS},$1) 
+          WHERE ${CONSTANT.USER_ID} = '${userid}' 
+          AND type = '${CONSTANT.ORDER_TYPE}'`
         );
         bucket.query(query, [order], (err, row) => {
           if (err) {
