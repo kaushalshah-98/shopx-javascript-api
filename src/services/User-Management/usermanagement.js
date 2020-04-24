@@ -2,7 +2,6 @@ const { app, bucket, niql, uuid } = require('../../config/connection');
 const { sendmail } = require('../Other-functions/sharedfunctions');
 const { CONSTANT } = require('../../shared/constant');
 
-//Api for verifying the user
 app.post('/verifyuser', async (req, res) => {
   const { name, password } = req.body;
   const query = niql.fromString(
@@ -26,7 +25,6 @@ app.post('/verifyuser', async (req, res) => {
     res.send(err);
   }
 });
-//Api for Getting the user
 app.get('/getuser/:userid', async (req, res) => {
   const userid = req.params.userid;
   const query = niql.fromString(
@@ -46,7 +44,6 @@ app.get('/getuser/:userid', async (req, res) => {
     res.send(err);
   }
 });
-//Api for getting the password
 app.post('/forgotpassword', async (req, res) => {
   const { name, email } = req.body;
   const query = niql.fromString(
@@ -73,7 +70,6 @@ app.post('/forgotpassword', async (req, res) => {
     res.send(err);
   }
 });
-//Api for Updating the user data
 app.put('/updateuserdata/:userid', async (req, res) => {
   const userid = req.params.userid;
   const { name, password, email, profilepic } = req.body;
@@ -101,7 +97,6 @@ app.put('/updateuserdata/:userid', async (req, res) => {
     res.send(err);
   }
 });
-//Api for Creating the user
 app.post('/createuser', async (req, res) => {
   const userdoc = req.body;
   const userid = 'USER::' + uuid.v4();
@@ -144,7 +139,6 @@ app.post('/createuser', async (req, res) => {
   //     }
   // });
 });
-//Api for Sending Mail to the user
 app.post('/sendmessage', async (req, res) => {
   const { subject, message } = req.body;
   const receiver = 'shopx589@gmail.com';

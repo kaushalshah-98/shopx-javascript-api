@@ -1,7 +1,6 @@
 const { app, bucket, niql, dateformat } = require('../../config/connection');
 const { CONSTANT } = require('../../shared/constant');
 
-//Api to get the wishlist items of particular user
 app.get('/getUserOrder/:userid', async (req, res) => {
   const order_id = 'ORDER::' + req.params.userid;
   const query = niql.fromString(
@@ -23,7 +22,6 @@ app.get('/getUserOrder/:userid', async (req, res) => {
     res.send(err);
   }
 });
-//Api to get the wishlist items of particular user
 app.get('/getallorders', async (req, res) => {
   const query = niql.fromString(
     `SELECT {u.name,u.profilepic,a.orders} AS orders
@@ -45,7 +43,6 @@ app.get('/getallorders', async (req, res) => {
     res.send(err);
   }
 });
-//Api for Creating the user
 app.post('/addorder/:userid', async (req, res) => {
   const order_id = 'ORDER::' + req.params.userid;
   const userid = req.params.userid;

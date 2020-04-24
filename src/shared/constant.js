@@ -3,6 +3,7 @@ const CONSTANT = {
   USER_TYPE: 'USER',
   PRODUCT_TYPE: 'PRODUCT',
   PRODUCT_INNERCATEGORY: 'innercategory',
+  PRODUCT_CATEGORY: 'category',
   WISHLIST_TYPE: 'WISHLIST',
   USER_ID: 'userid',
   CART_TYPE: 'CART',

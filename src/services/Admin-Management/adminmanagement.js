@@ -2,7 +2,6 @@ const { app, bucket, niql, uuid } = require('../../config/connection');
 const { sendmail } = require('../Other-functions/sharedfunctions');
 const { CONSTANT } = require('../../shared/constant');
 
-//Api for fetching Al users
 app.get('/getallusers', async (req, res) => {
   const query = niql.fromString(
     `SELECT ${CONSTANT.BUCKET_NAME} as users 
@@ -22,7 +21,6 @@ app.get('/getallusers', async (req, res) => {
     res.send(err);
   }
 });
-//Api for Blocking the user
 app.put('/blockuser/:userid', async (req, res) => {
   const userid = req.params.userid;
   const { status } = req.body;

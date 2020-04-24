@@ -1,7 +1,6 @@
 const { app, bucket, niql } = require('../../config/connection');
 const { CONSTANT } = require('../../shared/constant');
 
-//Api to get the cart items of particular user
 app.get('/getcartitems/:userid', async (req, res) => {
   const cartId = 'CART::' + req.params.userid;
   const query = niql.fromString(
@@ -28,7 +27,6 @@ app.get('/getcartitems/:userid', async (req, res) => {
     res.send(err);
   }
 });
-// //Api to get the cart size of particular user
 app.get('/cartsize/:userid', async (req, res) => {
   const cartId = 'CART::' + req.params.userid;
 
@@ -51,7 +49,6 @@ app.get('/cartsize/:userid', async (req, res) => {
     res.send(err);
   }
 });
-// //Api to add product to cart
 app.post('/AddTocart', async (req, res) => {
   const { product_id, userid } = req.body;
   const cartId = 'CART::' + userid;
@@ -129,7 +126,6 @@ app.post('/AddTocart', async (req, res) => {
     res.send(err);
   }
 });
-// //Api to empty cart of particular user
 app.delete('/emptycart/:userid', async (req, res) => {
   const userid = req.params.userid;
   const cartId = 'CART::' + userid;
@@ -145,7 +141,6 @@ app.delete('/emptycart/:userid', async (req, res) => {
     res.send(err);
   }
 });
-// //Api to remove cartitem
 app.put('/removecartitem/:userid', async (req, res) => {
   const { product_id } = req.body;
   const userid = req.params.userid;
@@ -192,7 +187,6 @@ app.put('/removecartitem/:userid', async (req, res) => {
   //     }
   // });
 });
-// //Api to update cartitem
 app.put('/updatecartitem/:userid', async (req, res) => {
   const { quantity, product_id } = req.body;
   const userid = req.params.userid;

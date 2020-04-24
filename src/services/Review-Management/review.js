@@ -1,7 +1,6 @@
 const { app, bucket, niql } = require('../../config/connection');
 const { CONSTANT } = require('../../shared/constant');
 
-//Api to get the wishlist items of particular user
 app.get('/getreviews/:product_id', async (req, res) => {
   const review_id = 'REVIEW::' + req.params.product_id;
   const query = niql.fromString(
@@ -24,7 +23,6 @@ app.get('/getreviews/:product_id', async (req, res) => {
   }
 });
 
-//Api for Creating the user
 app.post('/addreview/:product_id', async (req, res) => {
   const review_id = 'REVIEW::' + req.params.product_id;
   const reviewarray = req.body;
@@ -33,7 +31,6 @@ app.post('/addreview/:product_id', async (req, res) => {
     product_id: req.params.product_id,
     type: 'REVIEW'
   };
-  // method 1
   try {
     await bucket.upsert(review_id, doc, (err, row) => {
       if (err) {
@@ -45,20 +42,4 @@ app.post('/addreview/:product_id', async (req, res) => {
   } catch (err) {
     res.send(err);
   }
-  //method 2
-  // let query = niql.fromString("INSERT INTO `user` (KEY,VALUE) VALUES ($1, $2)");
-  // console.log(query);
-  // user_await bucket.query(query, [userid, userdoc], (err, row) => {
-  //     if (err) {
-  //         errr = {
-  //             Errorcode: err.errno,
-  //             ErrorMessage: err.message,
-  //             Status: err.code
-  //         };
-  //         res.send(errr)
-  //         console.log(err)
-  //     } else {
-  //         console.log(row);
-  //     }
-  // });
 });

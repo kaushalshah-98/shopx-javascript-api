@@ -1,7 +1,6 @@
 const { app, bucket, niql } = require('../../config/connection');
 const { CONSTANT } = require('../../shared/constant');
 
-//Api to get the wishlist items of particular user
 app.get('/getwishlistitems/:userid', async (req, res) => {
   const wishlist_id = 'WISHLIST::' + req.params.userid;
   const query = niql.fromString(
@@ -28,7 +27,6 @@ app.get('/getwishlistitems/:userid', async (req, res) => {
     res.send(err);
   }
 });
-// //Api to add product to wishlist
 app.post('/AddToWishlist', async (req, res) => {
   const { product_id, userid } = req.body;
   const wishlist_id = 'WISHLIST::' + userid;
@@ -96,7 +94,6 @@ app.post('/AddToWishlist', async (req, res) => {
     res.send(err);
   }
 });
-// //Api to empty wishlist of particular user
 app.delete('/emptywishlist/:userid', async (req, res) => {
   const userid = req.params.userid;
   const wishlist_id = 'WISHLIST::' + userid;
@@ -112,7 +109,6 @@ app.delete('/emptywishlist/:userid', async (req, res) => {
     res.send(err);
   }
 });
-// //Api to remove wishlistitem
 app.put('/removewishlistitem/:userid', async (req, res) => {
   const { product_id } = req.body;
   const userid = req.params.userid;

@@ -1,7 +1,6 @@
 const { app, bucket, niql } = require('../../config/connection');
 const { CONSTANT } = require('../../shared/constant');
 
-//Api for fetching Al users
 app.get('/theme/:userid', async (req, res) => {
   const userid = req.params.userid;
   const query = niql.fromString(
@@ -21,7 +20,6 @@ app.get('/theme/:userid', async (req, res) => {
     res.send(err);
   }
 });
-//Api for Blocking the user
 app.put('/changetheme/:userid', async (req, res) => {
   const userid = req.params.userid;
   const { night_theme } = req.body;

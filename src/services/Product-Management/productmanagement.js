@@ -1,7 +1,6 @@
 const { app, bucket, niql, uuid } = require('../../config/connection');
 const { CONSTANT } = require('../../shared/constant');
 
-//Api to Fetch all product details
 app.get('/getallproducts', async (req, res) => {
   const query = niql.fromString(
     `SELECT ${CONSTANT.BUCKET_NAME} as product 
@@ -21,14 +20,14 @@ app.get('/getallproducts', async (req, res) => {
     res.send(err);
   }
 });
-//Api to Fetch all product via category
-app.get('/getallproducts/:innercategory', async (req, res) => {
-  const innercategory = req.params.innercategory;
+app.post('/getproducts', async (req, res) => {
+  const { category, innercategory } = req.body;
   const query = niql.fromString(
     `SELECT ${CONSTANT.BUCKET_NAME} as product 
       FROM  ${CONSTANT.BUCKET_NAME} 
       WHERE type = '${CONSTANT.PRODUCT_TYPE}'
-      AND ${CONSTANT.PRODUCT_INNERCATEGORY} = '${innercategory}'`
+      AND ${CONSTANT.PRODUCT_INNERCATEGORY} = '${innercategory}'
+      AND ${CONSTANT.PRODUCT_CATEGORY} ='${category}'`
   );
   try {
     await bucket.query(query, (err, row) => {
@@ -43,7 +42,6 @@ app.get('/getallproducts/:innercategory', async (req, res) => {
     res.send(err);
   }
 });
-//Api to add a Product
 app.post('/addproduct', async (req, res) => {
   const productdoc = req.body;
   const product_id = 'PRODUCT::' + uuid.v4();
@@ -62,7 +60,6 @@ app.post('/addproduct', async (req, res) => {
     res.send(err);
   }
 });
-// Api to remove a product
 app.delete('/removeproduct/:productid', async (req, res) => {
   const product_id = req.params.productid;
   try {
@@ -77,7 +74,6 @@ app.delete('/removeproduct/:productid', async (req, res) => {
     res.send(err);
   }
 });
-// Api to get a product
 app.get('/getproduct/:productid', async (req, res) => {
   const product_id = req.params.productid;
   const query = niql.fromString(
@@ -98,7 +94,6 @@ app.get('/getproduct/:productid', async (req, res) => {
     res.send(err);
   }
 });
-//Api for Updating a product
 app.put('/updateproduct/:productid', async (req, res) => {
   const product_id = req.params.productid;
   const productdoc = req.body;
